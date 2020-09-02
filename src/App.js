@@ -5,7 +5,7 @@ function App() {
   return (
     <div id="App" className="row" style={{ "height": "100vh", background: 'red' }}>
       <Game />
-    </div >
+    </div>
   );
 }
 
