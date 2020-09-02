@@ -15,11 +15,11 @@ class EnemyShip extends React.Component {
     moveShip() {
         this.setState(state => ({ posX: state.posX + this.increments }));
         if ((this.state.directionX && this.state.posX >= this.container_width - this.width) || (!this.state.directionX && this.state.posX <= 0)) {
-            this.setState(state => ({ directionX: !state.directionX, posY: state.posY + this.height }));
+            this.setState(state => ({ directionX: !state.directionX, posY: state.posY + 4 * (this.height) }));
             this.increments = -this.increments;
         }
 
-        if (this.state.posY >= 16) {
+        if (this.state.posY >= this.container_height) {
             this.die();
         }
     }
@@ -28,7 +28,6 @@ class EnemyShip extends React.Component {
         console.log('fire');
         clearInterval(this.fireId);
         const randTime = Math.random() * (1000, 3000) + 1000;
-        console.log('arand: ', randTime);
         this.fireId = setInterval(() => { this.fire() }, randTime);
     }
 
@@ -45,7 +44,7 @@ class EnemyShip extends React.Component {
         this.container_height = container.clientHeight;
         this.timerId = setInterval(() => {
             this.moveShip();
-        }, 600);
+        }, 50);
         const randTime = Math.random() * (1000, 3000) + 1000;
         console.log('randomTime: ', randTime);
         this.fireId = setInterval(() => { this.fire() }, randTime);
