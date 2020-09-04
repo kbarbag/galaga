@@ -1,0 +1,5 @@
+const ENEMY_WIDTH = 16;
+const ENEMY_HEIGHT = 16;
+const ENEMY_PADDING_X = 5;
+
+export default { ENEMY_WIDTH, ENEMY_HEIGHT, ENEMY_PADDING_X };
