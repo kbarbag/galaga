@@ -1,6 +1,7 @@
 import React from 'react';
 import EnemyShip from './EnemyShip';
 import Player from './Player';
+import Missile from './Missile';
 import constantVars from './Constants';
 
 class Game extends React.Component {
@@ -13,8 +14,9 @@ class Game extends React.Component {
                 enemies[i].push({ alive: true, directionX: true, posX: (j * constantVars.ENEMY_WIDTH) + (j * constantVars.ENEMY_PADDING_X), posY: (i * constantVars.ENEMY_HEIGHT) + (i * constantVars.ENEMY_PADDING_X), tick: 0, position: { x: 0, y: 0 } });
             }
         }
-        this.state = { tick: 0, enemyDirectionRight: true, enemies, positions: [], player: { alive: true, posX: 0, posY: 0} }
+        this.state = { tick: 0, enemyDirectionRight: true, enemies, positions: [], player: { alive: true, posX: 0, posY: 0}, missiles: [] }
         this.modTicks = 0;
+        this.missileCount = 0;
         this.increments = constantVars.ENEMY_WIDTH + constantVars.ENEMY_PADDING_X;
         this.arena_height = 0;
         this.arena_width = 0;
@@ -55,6 +57,7 @@ class Game extends React.Component {
         console.log('event:');
         console.log(evt.keyCode);
         const player = this.state.player;
+        let missiles = this.state.missiles;
         if (evt.keyCode === 37) {
             player.posX = Math.max(0, player.posX - 16);
         }
@@ -68,7 +71,12 @@ class Game extends React.Component {
             player.posY = Math.min(this.arena_height - (1 * constantVars.ENEMY_HEIGHT
             ), player.posY + constantVars.ENEMY_HEIGHT);
         }
-        this.setState({player});
+        if (evt.keyCode === 32) {
+            //create missile
+            this.missileCount += 1;
+            missiles.push({alive: true, key: 'missile_'+this.missileCount, posX: this.state.player.posX, posY: this.state.player.posY + constantVars.ENEMY_HEIGHT})
+        }
+        this.setState({player, missiles});
         return;
     }
 
@@ -99,9 +107,11 @@ class Game extends React.Component {
                 items.push(<EnemyShip key={i + "_" + j} x={j} y={i} posX={this.state.enemies[i][j]['posX']} posY={this.state.enemies[i][j]['posY']} alive={this.state.enemies[i][j]['alive']} />);
             }
         }
+        const missileItems = this.state.missiles.map(missile => <Missile key={missile.key} alive={missile.alive} posX={missile.posX} posY={missile.posY} />);
         return (
             <div id="arena" tabIndex="0" onKeyDown={this.playerKeyDown} className="col-6 offset-3 text-center" style={{ background: 'blue', 'outlineWidth': '0' }}>
                 {items}
+                {missileItems}
                 <Player key='da' alive={true} posX={this.state.player.posX} posY={this.state.player.posY} />
             </div>
         );
