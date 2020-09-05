@@ -1,5 +1,6 @@
 import React from 'react';
 import EnemyShip from './EnemyShip';
+import Player from './Player';
 import constantVars from './Constants';
 
 class Game extends React.Component {
@@ -12,11 +13,13 @@ class Game extends React.Component {
                 enemies[i].push({ alive: true, directionX: true, posX: (j * constantVars.ENEMY_WIDTH) + (j * constantVars.ENEMY_PADDING_X), posY: (i * constantVars.ENEMY_HEIGHT) + (i * constantVars.ENEMY_PADDING_X), tick: 0, position: { x: 0, y: 0 } });
             }
         }
-        this.state = { tick: 0, enemyDirectionRight: true, enemies, positions: [] }
+        this.state = { tick: 0, enemyDirectionRight: true, enemies, positions: [], player: { alive: true, posX: 0, posY: 0} }
         this.modTicks = 0;
         this.increments = constantVars.ENEMY_WIDTH + constantVars.ENEMY_PADDING_X;
         this.arena_height = 0;
+        this.arena_width = 0;
         this.updateEnemies = this.updateEnemies.bind(this);
+        this.playerKeyDown = this.playerKeyDown.bind(this);
     }
 
     updateEnemies() {
@@ -48,14 +51,35 @@ class Game extends React.Component {
         setTimeout(() => { requestAnimationFrame(this.updateEnemies); }, 200);
     }
 
+    playerKeyDown(evt) {
+        console.log('event:');
+        console.log(evt.keyCode);
+        const player = this.state.player;
+        if (evt.keyCode === 37) {
+            player.posX = Math.max(0, player.posX - 16);
+        }
+        if (evt.keyCode === 39) {
+            player.posX = Math.min(this.arena_width - constantVars.ENEMY_WIDTH, player.posX + 16);
+        }
+        if (evt.keyCode === 40) {
+            player.posY = Math.max(0, player.posY - constantVars.ENEMY_HEIGHT);
+        }
+        if (evt.keyCode === 38) {
+            player.posY = Math.min(this.arena_height - (1 * constantVars.ENEMY_HEIGHT
+            ), player.posY + constantVars.ENEMY_HEIGHT);
+        }
+        this.setState({player});
+        return;
+    }
+
     componentDidMount() {
         const arena = document.getElementById('arena');
-        const arena_width = arena.clientWidth;
+        this.arena_width = arena.clientWidth;
         this.arena_height = arena.clientHeight;
-        const horizontalPositions = Math.floor(arena_width / constantVars.ENEMY_WIDTH);
+        const horizontalPositions = Math.floor(this.arena_width / constantVars.ENEMY_WIDTH);
         const verticalPositions = Math.floor(this.arena_height / constantVars.ENEMY_HEIGHT);
 
-        this.modTicks = Math.floor((arena_width + (2*constantVars.ENEMY_PADDING_X) - ((this.state.enemies[0].length-1) * (constantVars.ENEMY_WIDTH + constantVars.ENEMY_PADDING_X))) / (constantVars.ENEMY_WIDTH + constantVars.ENEMY_PADDING_X));
+        this.modTicks = Math.floor((this.arena_width + (2*constantVars.ENEMY_PADDING_X) - ((this.state.enemies[0].length-1) * (constantVars.ENEMY_WIDTH + constantVars.ENEMY_PADDING_X))) / (constantVars.ENEMY_WIDTH + constantVars.ENEMY_PADDING_X));
         let tempPositions = [];
         for (let i = 0; i < verticalPositions; i++) {
             tempPositions.push(new Array(horizontalPositions));
@@ -76,8 +100,9 @@ class Game extends React.Component {
             }
         }
         return (
-            <div id="arena" className="col-6 offset-3 text-center" style={{ background: 'blue' }}>
+            <div id="arena" tabIndex="0" onKeyDown={this.playerKeyDown} className="col-6 offset-3 text-center" style={{ background: 'blue', 'outlineWidth': '0' }}>
                 {items}
+                <Player key='da' alive={true} posX={this.state.player.posX} posY={this.state.player.posY} />
             </div>
         );
     }
